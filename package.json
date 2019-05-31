@@ -1,0 +1,29 @@
+{
+  "name":"infobip-node",
+  "version":"0.0.1",
+  "description":"",
+  "main":"index.js",
+  "files":[
+    "src",
+    "index.js"
+  ],
+  "keywords":[
+    "infobip",
+    "SMS",
+    "API",
+    "sms messages",
+    "adonisjs"
+  ],
+  "scripts":{
+    "test": "node test/provider.spec.js"
+  },
+  "author": "StitchNG <stitchnig@gmail.com> (https://twitter.com/stitchappn)",
+  "license": "MIT",
+  "dependencies": {
+    "got":"^9.3.2",
+    "lodash": "^4.17.10",
+    "debug":"^3.1.2"
+  },
+  "devdependencies":{
+  }
+}
