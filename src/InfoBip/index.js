@@ -63,6 +63,10 @@ class InfoBip {
       route_params: { type: String }
     }
 
+    if (!headers.to) {
+      throw new Error('phone number(s) required')
+    }
+
     let pathname = setPathName(config, { m_type: 'multi', s_type: 'single' }, headers)
 
     if (config.send_json) {
