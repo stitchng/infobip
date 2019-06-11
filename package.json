@@ -15,16 +15,33 @@
     "adonisjs"
   ],
   "scripts": {
-    "test": "mocha test/lib.spec.js"
+    "lint": "node ./node_modules/standard/bin/cmd.js --fix",
+    "test": "mocha \"test/*.test.js\""
   },
   "author": "StitchNG <stitchnig@gmail.com> (https://twitter.com/stitchappn)",
   "license": "MIT",
+  "standard": {
+    "globals": [
+      "describe",
+      "it"
+    ]
+  },
   "dependencies": {
     "got": "^8.3.2",
     "lodash": "^4.17.10",
     "debug": "^3.1.2"
   },
   "devDependencies": {
-    "mocha": "^5.2.0"
-  }
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "standard": "^12.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stitchng/infobip.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stitchng/infobip/issues"
+  },
+  "homepage": "https://github.com/stitchng/infobip#readme"
 }
