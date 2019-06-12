@@ -15,7 +15,7 @@ This project provides an easy-to-use object-oriented API to access endpoints del
 
 ```bash
 
-  npm i --save infobip-node
+  npm i --save infobip-nodejs
 
 ```
 
@@ -23,7 +23,7 @@ This project provides an easy-to-use object-oriented API to access endpoints del
 
 ```js
 
-let InfoBip = require('infobip-node')
+let InfoBip = require('infobip-nodejs')
 
 let APIKEY = '1IkXmSWOlE4y9Inhgyd6g5f2R7'
 const environment = process.env.NODE_ENV
