@@ -12,6 +12,8 @@ describe('InfoBip Instance Test(s)', function () {
   it('should have a function [send]', function () {
     /* eslint-disable no-unused-expressions */
     expect((typeof instance.send === 'function')).to.be.true
+    expect((typeof instance.purchaseNumber === 'function')).to.be.true
+    expect((typeof instance.numbers === 'function')).to.be.true
     /* eslint-enable no-unused-expressions */
   })
 
