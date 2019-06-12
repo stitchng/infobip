@@ -1,5 +1,5 @@
 {
-  "name": "infobip-node",
+  "name": "infobip-nodejs",
   "version": "0.0.1",
   "description": "A NodeJS Wrapper for InfoBip",
   "main": "index.js",
@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "lint": "node ./node_modules/standard/bin/cmd.js --fix",
-    "test": "mocha \"test/*.test.js\""
+    "test": "cross-env NODE_ENV=testing mocha \"test/*.test.js\""
   },
   "author": "StitchNG <stitchnig@gmail.com> (https://twitter.com/stitchappn)",
   "license": "MIT",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
     "mocha": "^5.2.0",
     "standard": "^12.0.1"
   },

@@ -41,10 +41,25 @@ _.mixin(function () {
 
 const isTypeOf = (_value, type) => {
   let value = Object(_value)
-  return (value instanceof type)
+
+  if (typeof type !== 'function') {
+    if (!Array.isArray(type)) {
+      return false
+    }
+
+    let bitPiece = 0
+
+    type.forEach(_type => {
+      bitPiece |= Number((value instanceof _type))
+    })
+
+    return Boolean(bitPiece)
+  } else {
+    return (value instanceof type)
+  }
 }
 
-const setPathName = (config = { path: '' }, params = {}, values = {}) => {
+const setPathName = (config = { path: '' }, params = {}) => {
   if (!config.route_params) {
     return config.path
   }
@@ -55,11 +70,7 @@ const setPathName = (config = { path: '' }, params = {}, values = {}) => {
     offset) {
     let _value = null
 
-    if (config.path.indexOf('/sms/1/text/') + 1) {
-      _value = Array.isArray(params.to) ? values['m_' + string] : values['s_' + string]
-    }
-
-    if (config.path.indexOf('/numbers/1/numbers/') + 1) {
+    if (config.path.length) {
       _value = params[string]
     }
 
@@ -143,11 +154,13 @@ const setInputValues = (config, inputs) => {
 class InfoBip {
   constructor (apiKey, isProduction = false, config = {}) {
     this.api_base = {
-      sandbox: 'https://api.infobip.com',
+      sandbox: 'http://api.infobip.com',
       live: 'https://api.infobip.com'
     }
 
-    this.baseUrl = isProduction ? this.api_base.live : this.api_base.sandbox
+    this.baseUrl = (config.encrypted || isProduction
+      ? this.api_base.live
+      : this.api_base.sandbox)
 
     this.httpConfig = {
       headers: {
@@ -183,6 +196,7 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     this.httpConfig.query = data.query
+    delete this.httpConfig.body
 
     let reqVerb = config.method.toLowerCase()
 
@@ -212,6 +226,7 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     this.httpConfig.query = data.query
+    delete this.httpConfig.body
 
     let reqVerb = config.method.toLowerCase()
 
@@ -247,6 +262,7 @@ class InfoBip {
     }
 
     this.httpConfig.body = data.body
+    delete this.httpConfig.query
 
     let reqVerb = config.method.toLowerCase()
 
@@ -256,13 +272,13 @@ class InfoBip {
     )
   }
 
-  send (params = {}) {
+  sendVoiceBulk (params = {}) {
     let config = {
       send_json: true,
       method: 'POST',
-      path: '/sms/1/text/{:type}',
-      route_params: { type: String },
-      params: { to$: String, text$: String }
+      path: '/tts/3/multi',
+      route_params: null,
+      params: { messages$: Array }
     }
 
     if (config.route_params !== null ||
@@ -273,7 +289,7 @@ class InfoBip {
     }
 
     let data = setInputValues(config, params)
-    let pathname = setPathName(config, params, { m_type: 'multi', s_type: 'single' })
+    let pathname = setPathName(config, params)
 
     if (config.send_json) {
       this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
@@ -282,6 +298,148 @@ class InfoBip {
     }
 
     this.httpConfig.body = data.body
+    delete this.httpConfig.query
+
+    let reqVerb = config.method.toLowerCase()
+
+    return got[reqVerb](
+      `${this.baseUrl}${pathname}`,
+      this.httpConfig
+    )
+  }
+
+  sendVoice (params = {}) {
+    let config = {
+      send_json: true,
+      method: 'POST',
+      path: '/tts/3/single',
+      route_params: null,
+      params: { audioFileUrl: String, to$: [Array, String], text: String, from: String, language: String },
+      param_defaults: { language: 'en' }
+    }
+
+    if (config.route_params !== null ||
+      config.params !== null) {
+      if (_.isEmpty(params)) {
+        throw new Error('infobip api: route/input parameter(s) required')
+      }
+    }
+
+    let data = setInputValues(config, params)
+    let pathname = setPathName(config, params)
+
+    if (config.send_json) {
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+    } else if (config.send_form) {
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+    }
+
+    this.httpConfig.body = data.body
+    delete this.httpConfig.query
+
+    let reqVerb = config.method.toLowerCase()
+
+    return got[reqVerb](
+      `${this.baseUrl}${pathname}`,
+      this.httpConfig
+    )
+  }
+
+  sendSMSBulk (params = {}) {
+    let config = {
+      send_json: true,
+      method: 'POST',
+      path: '/sms/1/text/multi',
+      route_params: null,
+      params: { messages$: Array }
+    }
+
+    if (config.route_params !== null ||
+      config.params !== null) {
+      if (_.isEmpty(params)) {
+        throw new Error('infobip api: route/input parameter(s) required')
+      }
+    }
+
+    let data = setInputValues(config, params)
+    let pathname = setPathName(config, params)
+
+    if (config.send_json) {
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+    } else if (config.send_form) {
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+    }
+
+    this.httpConfig.body = data.body
+    delete this.httpConfig.query
+
+    let reqVerb = config.method.toLowerCase()
+
+    return got[reqVerb](
+      `${this.baseUrl}${pathname}`,
+      this.httpConfig
+    )
+  }
+
+  sendSMS (params = {}) {
+    let config = {
+      send_json: true,
+      method: 'POST',
+      path: '/sms/{:form}/text/single',
+      route_params: { form: Number },
+      params: { to$: [Array, String], text$: String, from: String }
+    }
+
+    if (config.route_params !== null ||
+      config.params !== null) {
+      if (_.isEmpty(params)) {
+        throw new Error('infobip api: route/input parameter(s) required')
+      }
+    }
+
+    params.form = (typeof params.to === 'string') ? 1 : 2
+
+    let data = setInputValues(config, params)
+    let pathname = setPathName(config, params)
+
+    if (config.send_json) {
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+    } else if (config.send_form) {
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+    }
+
+    this.httpConfig.body = data.body
+    delete this.httpConfig.query
+
+    let reqVerb = config.method.toLowerCase()
+
+    return got[reqVerb](
+      `${this.baseUrl}${pathname}`,
+      this.httpConfig
+    )
+  }
+
+  getSMSDeliveryReports (params = {}) {
+    let config = {
+      send_json: false,
+      method: 'GET',
+      path: '/sms/1/reports',
+      route_params: null,
+      params: null
+    }
+
+    if (config.route_params !== null ||
+      config.params !== null) {
+      if (_.isEmpty(params)) {
+        throw new Error('infobip api: route/input parameter(s) required')
+      }
+    }
+
+    // let data = setInputValues(config, params)
+    let pathname = setPathName(config, params)
+
+    delete this.httpConfig.query
+    delete this.httpConfig.body
 
     let reqVerb = config.method.toLowerCase()
 

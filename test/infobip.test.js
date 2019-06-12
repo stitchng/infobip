@@ -7,17 +7,25 @@ var should = chai.should()
 describe('InfoBip Instance Test(s)', function () {
   // Created Instance
   var InfoBip = require('../index.js')
-  var instance = new InfoBip('1IkXmSWOlE4y9Inhgyd6g5f2R7')
+  var isProd = (process.env.NODE_ENV === 'production')
+  var instance = new InfoBip('1IkXmSWOlE4y9Inhgyd6g5f2R7', isProd, {
+    authType: 'key',
+    encrypted: true
+  })
 
-  it('should have a function [send]', function () {
+  it('should have all methods defined', function () {
     /* eslint-disable no-unused-expressions */
-    expect((typeof instance.send === 'function')).to.be.true
+    expect((typeof instance.sendSMS === 'function')).to.be.true
     expect((typeof instance.purchaseNumber === 'function')).to.be.true
     expect((typeof instance.numbers === 'function')).to.be.true
+    expect((typeof instance.sendSMSBulk === 'function')).to.be.true
+    expect((typeof instance.sendVoice === 'function')).to.be.true
+    expect((typeof instance.sendVoiceBulk === 'function')).to.be.true
+    expect((typeof instance.getSMSDeliveryReports === 'function')).to.be.true
     /* eslint-enable no-unused-expressions */
   })
 
-  it('should throw an error if method is called without required arguments', function () {
+  it('should throw an error if [send] method is called without required arguments', function () {
     try {
       instance.send()
     } catch (err) {
