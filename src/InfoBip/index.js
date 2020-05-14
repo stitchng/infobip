@@ -39,25 +39,60 @@ _.mixin(function () {
   }
 }())
 
-const isTypeOf = (_value, type) => {
-  let value = Object(_value)
+const isLiteralFalsey = (variable) => {
+    return (variable === "" || variable === false || variable === 0)
+}
 
-  if (typeof type !== 'function') {
-    if (!Array.isArray(type)) {
-      return false
+
+const checkTypeName = (target, type) => {
+    let typeName = ""
+
+    if(isLiteralFalsey(target)){
+        typeName = (typeof target)
+    }else{
+        typeName = ("" + (target && target.constructor.name))
+    }
+    return Boolean(typeName.toLowerCase().indexOf(type) + 1)
+}
+
+
+
+const isTypeOf = (value, type) => {
+  
+    let result = false
+
+    type = type || []
+
+    if(typeof type === 'object'){
+
+        if(typeof type.length !== 'number'){
+            return result
+        }
+
+        let bitPiece = 0
+
+        type = [].slice.call(type)
+
+        type.forEach( _type => {
+            if(typeof _type === 'function'){
+                _type = (_type.name || _type.displayName).toLowerCase()
+            }
+
+            bitPiece |= Number(checkTypeName(value, _type))
+        });
+
+        result = !!(bitPiece)
+    }else{
+
+        if(typeof type === 'function'){
+            type = (type.name || type.displayName).toLowerCase()
+        }
+
+        result = checkTypeName(value, type)
     }
 
-    let bitPiece = 0
-
-    type.forEach(_type => {
-      bitPiece |= Number((value instanceof _type))
-    })
-
-    return Boolean(bitPiece)
-  } else {
-    return (value instanceof type)
-  }
-}
+    return result;
+};
 
 const setPathName = (config = { path: '' }, params = {}) => {
   if (!config.route_params) {
@@ -154,7 +189,7 @@ const setInputValues = (config, inputs) => {
 class InfoBip {
   constructor (apiKey, isProduction = false, config = {}) {
     this.api_base = {
-      sandbox: 'http://api.infobip.com',
+      sandbox: 'https://api.infobip.com',
       live: 'https://api.infobip.com'
     }
 
