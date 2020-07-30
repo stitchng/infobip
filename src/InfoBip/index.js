@@ -40,75 +40,57 @@ _.mixin(function () {
 }())
 
 const isLiteralFalsey = (variable) => {
-    return (variable === "" || variable === false || variable === 0)
+  return (variable === '' || variable === false || variable === 0)
 }
-
 
 const checkTypeName = (target, type) => {
-    let typeName = ""
-
-    if(isLiteralFalsey(target)){
-        typeName = (typeof target)
-    }else{
-        typeName = ("" + (target && target.constructor.name))
-    }
-    return Boolean(typeName.toLowerCase().indexOf(type) + 1)
+  let typeName = ''
+  if (isLiteralFalsey(target)) {
+    typeName = (typeof target)
+  } else {
+    typeName = ('' + (target && target.constructor.name))
+  }
+  return !!(typeName.toLowerCase().indexOf(type) + 1)
 }
 
-
-
 const isTypeOf = (value, type) => {
-  
-    let result = false
+  let result = false
 
-    type = type || []
+  type = type || []
 
-    if(typeof type === 'object'){
-
-        if(typeof type.length !== 'number'){
-            return result
-        }
-
-        let bitPiece = 0
-
-        type = [].slice.call(type)
-
-        type.forEach( _type => {
-            if(typeof _type === 'function'){
-                _type = (_type.name || _type.displayName).toLowerCase()
-            }
-
-            bitPiece |= Number(checkTypeName(value, _type))
-        });
-
-        result = !!(bitPiece)
-    }else{
-
-        if(typeof type === 'function'){
-            type = (type.name || type.displayName).toLowerCase()
-        }
-
-        result = checkTypeName(value, type)
+  if (typeof type === 'object') {
+    if (typeof type.length !== 'number') {
+      return result
     }
 
-    return result;
-};
+    let bitPiece = 0
+    type = [].slice.call(type)
 
-const setPathName = (config = { path: '' }, params = {}) => {
-  if (!config.route_params) {
-    return config.path
+    type.forEach(_type => {
+      if (typeof _type === 'function') {
+        _type = (_type.name || _type.displayName).toLowerCase()
+      }
+      bitPiece |= (1 * (checkTypeName(value, _type)))
+    })
+
+    result = !!(bitPiece)
+  } else {
+    if (typeof type === 'function') {
+      type = (type.name || type.displayName).toLowerCase()
+    }
+
+    result = checkTypeName(value, type)
   }
 
+  return result
+}
+
+const setPathName = (config, values) => {
   return config.path.replace(/\{:([\w]+)\}/g, function (
     match,
     string,
     offset) {
-    let _value = null
-
-    if (config.path.length) {
-      _value = params[string]
-    }
-
+    let _value = values[string]
     return isTypeOf(
       _value,
       config.route_params[string]
@@ -121,8 +103,8 @@ const setPathName = (config = { path: '' }, params = {}) => {
 const _jsonify = (data) => {
   return !data ? 'null'
     : (typeof data === 'object'
-      ? (data instanceof Date ? data.toISOString().replace(/Z$/, '') : (('toJSON' in data) ? data.toJSON().replace(/Z$/, '') : JSON.stringify(data)))
-      : String(data))
+      ? (data instanceof Date ? data.toDateString() : (('toJSON' in data) ? data.toJSON().replace(/T|Z/g, ' ') : JSON.stringify(data)))
+      : data)
 }
 
 const setInputValues = (config, inputs) => {
@@ -139,6 +121,7 @@ const setInputValues = (config, inputs) => {
     case 'POST':
     case 'PUT':
     case 'PATCH':
+    case 'DELETE':
       label = 'body'
       break
   }
@@ -227,11 +210,24 @@ class InfoBip {
       }
     }
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
+    
+    if (config.send_json) {
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
+    } else if (config.send_form) {
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true;
+    }
 
-    this.httpConfig.query = data.query
     delete this.httpConfig.body
+    
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -257,11 +253,24 @@ class InfoBip {
       }
     }
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
+    
+    if (config.send_json) {
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
+    } else if (config.send_form) {
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true;
+    }
 
-    this.httpConfig.query = data.query
     delete this.httpConfig.body
+
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -287,17 +296,24 @@ class InfoBip {
       }
     }
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true;
     }
 
-    this.httpConfig.body = data.body
     delete this.httpConfig.query
+    
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -323,17 +339,24 @@ class InfoBip {
       }
     }
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true;
     }
 
-    this.httpConfig.body = data.body
     delete this.httpConfig.query
+    
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -360,17 +383,24 @@ class InfoBip {
       }
     }
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true;
     }
 
-    this.httpConfig.body = data.body
     delete this.httpConfig.query
+    
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -396,17 +426,24 @@ class InfoBip {
       }
     }
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true;
     }
 
-    this.httpConfig.body = data.body
-    delete this.httpConfig.query
+    delete this.httpConfig.query;
+    
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -421,8 +458,8 @@ class InfoBip {
       send_json: true,
       method: 'POST',
       path: '/sms/{:form}/text/single',
-      route_params: { form: Number },
-      params: { to$: [Array, String], text$: String, from: String }
+      route_params: { form: String },
+      params: { to$: ['array', 'string'], text$: String, from: String }
     }
 
     if (config.route_params !== null ||
@@ -432,19 +469,26 @@ class InfoBip {
       }
     }
 
-    params.form = (typeof params.to === 'string') ? 1 : 2
+    params.form = (typeof params.to === 'string') ? '1' : '2'
 
-    let data = setInputValues(config, params)
+    let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
     } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded';
+      this.httpConfig.form = true;
     }
 
-    this.httpConfig.body = data.body
     delete this.httpConfig.query
+    
+    for (let type in payload) {
+      if (payload.hasOwnProperty(type)) {
+        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
+      }
+    }
 
     let reqVerb = config.method.toLowerCase()
 
@@ -470,8 +514,15 @@ class InfoBip {
       }
     }
 
-    // let data = setInputValues(config, params)
     let pathname = setPathName(config, params)
+    
+    if (config.send_json) {
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
+      this.httpConfig.form = false;
+    } else if (config.send_form) {
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded';
+      this.httpConfig.form = true;
+    }
 
     delete this.httpConfig.query
     delete this.httpConfig.body
