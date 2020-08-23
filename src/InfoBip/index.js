@@ -212,17 +212,17 @@ class InfoBip {
 
     let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
-    
+
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true;
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.body
-    
+
     for (let type in payload) {
       if (payload.hasOwnProperty(type)) {
         this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
@@ -255,13 +255,13 @@ class InfoBip {
 
     let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
-    
+
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true;
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.body
@@ -300,15 +300,15 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true;
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.query
-    
+
     for (let type in payload) {
       if (payload.hasOwnProperty(type)) {
         this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
@@ -343,15 +343,15 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true;
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.query
-    
+
     for (let type in payload) {
       if (payload.hasOwnProperty(type)) {
         this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
@@ -387,15 +387,15 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true;
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.query
-    
+
     for (let type in payload) {
       if (payload.hasOwnProperty(type)) {
         this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
@@ -430,15 +430,15 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
       this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true;
+      this.httpConfig.form = true
     }
 
-    delete this.httpConfig.query;
-    
+    delete this.httpConfig.query
+
     for (let type in payload) {
       if (payload.hasOwnProperty(type)) {
         this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
@@ -475,15 +475,15 @@ class InfoBip {
     let pathname = setPathName(config, params)
 
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded';
-      this.httpConfig.form = true;
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.query
-    
+
     for (let type in payload) {
       if (payload.hasOwnProperty(type)) {
         this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
@@ -515,13 +515,13 @@ class InfoBip {
     }
 
     let pathname = setPathName(config, params)
-    
+
     if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept'];
-      this.httpConfig.form = false;
+      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
+      this.httpConfig.form = false
     } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded';
-      this.httpConfig.form = true;
+      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.form = true
     }
 
     delete this.httpConfig.query

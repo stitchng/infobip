@@ -1,5 +1,5 @@
 <a name="0.0.2"></a>
-# 0.0.2 (2020-07-30)
+# 0.0.2 (2020-08-23)
 
 ### Bug Fixes
 - got HTTP Requests fixed
