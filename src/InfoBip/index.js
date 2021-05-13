@@ -240,7 +240,8 @@ class InfoBip extends Mockable {
 
     let reqVerb = config.method.toLowerCase()
 
-    return this._mock !== null ? this._mock['sendVoice'](params) : got[reqVerb](
+    return this._mock !== null ? this._mock['sendVoice'].bind(this, params) : got[reqVerb].bind(
+      got,
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )
@@ -312,7 +313,8 @@ class InfoBip extends Mockable {
 
     let reqVerb = config.method.toLowerCase()
 
-    return this._mock !== null ? this._mock['sendSMSBinary'](params) : got[reqVerb](
+    return this._mock !== null ? this._mock['sendSMSBinary'].bind(this, params) : got[reqVerb].bind(
+      got,
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )
@@ -377,7 +379,8 @@ class InfoBip extends Mockable {
 
     let reqVerb = config.method.toLowerCase()
 
-    return this._mock !== null ? this._mock['sendSMS'](params) : got[reqVerb](
+    return this._mock !== null ? this._mock['sendSMS'].bind(this, params) : got[reqVerb].bind(
+      got,
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )
