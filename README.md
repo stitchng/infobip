@@ -3,10 +3,10 @@
 [![NPM Version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 
-A NodeJS Wrapper for [InfoBip](https://www.infobip.com)
+A NodeJS Wrapper for [InfoBip](https://www.infobip.com/docs/api#channels/)
 
 ## Overview
-This project provides an easy-to-use object-oriented API to access endpoints delineated at https://dev.infobip.com/getting-started
+This project provides an easy-to-use object-oriented API to access endpoints delineated at https://www.infobip.com/docs/api
 
 
 ## Installation
@@ -33,7 +33,8 @@ const infobip = new InfoBip(APIKEY, isProduction, {
   authType:'basic',
   username:'user', // Infobip Username used for registration
   password:'*******', // Infobip Password used for registration
-  encrypted:false
+  encrypted:false,
+  baseHost: 'okllaq.api.infobip.com'
 })
 
 /* 
@@ -42,42 +43,72 @@ const infobip = new InfoBip(APIKEY, isProduction, {
   - NB: make sure the Sender ID is registred with infobip before use
 */
 const promise = infobip.sendSMS({
-  from: "YourCompanyName", // Sender ID
-  to: ['2348164422256', '2347039664638'], // MTN Numbers
-  text: 'Dear Customer, Thanks for registering with our service.'
+  messages: [{
+    from: "YourCompanyName", // Sender ID
+    destinations: [
+      { to: '+2348164422256' },  // MTN Numbers
+      { to: '+2347039664638' }
+    ],
+    text: 'Dear Customer, Thanks for registering with our service.'
+  }],
+  bulkId: "BULK-ID-awq6545pOu7ye6" // Auto-generated with prefix: "BULK-ID-"
 })
 
 promise.then( response => {
- var data = response.body
+ const { body } = response
+ console.log('response body: ', body)
 }).catch( error => {
   console.error(error)
 })
 
-/* Create an async express middleware for infobip */
-async function infobipMiddleware(req, res, next){
-
-  const response = await infobip.numbers({
-    limit: 5, page: 0, number: '447860041117'
-  })
-
-  req.numbers = {
-    numberCount:response.body.numberCount
-  }
-
-  next()
-}
 ```
 
 ## API Resources
 
 - infobip.sendSMS()
-- infobip.sendSMSBulk()
+- infobip.sendSMSBinary()
 - infobip.sendVoice()
-- infobip.sendVoiceBulk()
-- infobip.numbers()
-- infobip.getNumber()
-- infobip.purchaseNumber()
-- infobip.getSMSDeliveryReports()
+
+## Mocking instance for Unit/Integration Tests
+
+```js
+
+const APIKEY = "hJ5Ds2e49jk0UiLa8fq36Sw7Y"
+const isProduction = false
+const infobip = new InfoBip(APIKEY, isProduction, {
+  authType:'basic',
+  username:'user', // Infobip Username used for registration
+  password:'*********', // Infobip Password used for registration
+  encrypted:false,
+  baseHost: 'okllaq.api.infobip.com'
+});
+
+// start mocking on instance (during a unit/integration test)
+infobip.engageMock()
+
+// calling a mocked method sendVoice()
+infobip.sendVoice({
+  from: "MyCompanyName", // Sender ID
+  to: "+2349023465560", // Airtel Number
+  language: "en",
+  voice: {
+    name: "Paul",
+    gender: "male"
+  }
+  text: "Just Saying Hello"
+});
+
+// stop mocking on instance
+infobip.disengageMock()
+
+// It's also possible to swap out mocked methods
+// with custom implementations
+infobip.mockMacro('sendSMS', function (params) {
+  return Promise.reject({
+    messageId: "xxxxxxxxxxxxxxxxxxxxxxxxx"
+  });
+});
+```
 
 # License
 

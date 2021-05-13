@@ -3,6 +3,7 @@
 const querystring = require('querystring')
 const _ = require('lodash')
 const got = require('got')
+const Mockable = require('../extension/Mockable.js')
 
 const getHttpBasicAuthString = (username, passcode) => {
   let buffer = Buffer.from(username + ':' + passcode)
@@ -169,12 +170,15 @@ const setInputValues = (config, inputs) => {
   return inputValues
 }
 
-class InfoBip {
+class InfoBip extends Mockable {
   constructor (apiKey, isProduction = false, config = {}) {
+    super()
     this.api_base = {
-      sandbox: 'https://api.infobip.com',
-      live: 'https://api.infobip.com'
+      sandbox: `https://${config.baseHost}`,
+      live: `https://${config.baseHost}`
     }
+
+    this.excludeOnMock = ['version']
 
     this.baseUrl = (config.encrypted || isProduction
       ? this.api_base.live
@@ -193,186 +197,13 @@ class InfoBip {
       : getHttpCustomAuthString(apiKey))
   }
 
-  numbers (params = {}) {
-    let config = {
-      send_json: false,
-      method: 'GET',
-      path: '/numbers/1/numbers/available',
-      route_params: null,
-      params: { limit: Number, page$: Number, number$: String, capabilities$: String, country$: String },
-      param_defaults: { country: 'NG', capabilities: 'SMS,VOICE', page: 0 }
-    }
-
-    if (config.route_params !== null ||
-      config.params !== null) {
-      if (_.isEmpty(params)) {
-        throw new Error('infobip api: route/input parameter(s) required')
-      }
-    }
-
-    let payload = setInputValues(config, params)
-    let pathname = setPathName(config, params)
-
-    if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
-      this.httpConfig.form = false
-    } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true
-    }
-
-    delete this.httpConfig.body
-
-    for (let type in payload) {
-      if (payload.hasOwnProperty(type)) {
-        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
-      }
-    }
-
-    let reqVerb = config.method.toLowerCase()
-
-    return got[reqVerb](
-      `${this.baseUrl}${pathname}`,
-      this.httpConfig
-    )
-  }
-
-  getNumber (params = {}) {
-    let config = {
-      send_json: false,
-      method: 'GET',
-      path: '/numbers/1/numbers/{:numberKey}',
-      route_params: { numberKey: String },
-      params: null
-    }
-
-    if (config.route_params !== null ||
-      config.params !== null) {
-      if (_.isEmpty(params)) {
-        throw new Error('infobip api: route/input parameter(s) required')
-      }
-    }
-
-    let payload = setInputValues(config, params)
-    let pathname = setPathName(config, params)
-
-    if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
-      this.httpConfig.form = false
-    } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true
-    }
-
-    delete this.httpConfig.body
-
-    for (let type in payload) {
-      if (payload.hasOwnProperty(type)) {
-        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
-      }
-    }
-
-    let reqVerb = config.method.toLowerCase()
-
-    return got[reqVerb](
-      `${this.baseUrl}${pathname}`,
-      this.httpConfig
-    )
-  }
-
-  purchaseNumber (params = {}) {
-    let config = {
-      send_json: true,
-      method: 'POST',
-      path: '/numbers/1/numbers',
-      route_params: null,
-      params: { numberKey$: String }
-    }
-
-    if (config.route_params !== null ||
-      config.params !== null) {
-      if (_.isEmpty(params)) {
-        throw new Error('infobip api: route/input parameter(s) required')
-      }
-    }
-
-    let payload = setInputValues(config, params)
-    let pathname = setPathName(config, params)
-
-    if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
-      this.httpConfig.form = false
-    } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true
-    }
-
-    delete this.httpConfig.query
-
-    for (let type in payload) {
-      if (payload.hasOwnProperty(type)) {
-        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
-      }
-    }
-
-    let reqVerb = config.method.toLowerCase()
-
-    return got[reqVerb](
-      `${this.baseUrl}${pathname}`,
-      this.httpConfig
-    )
-  }
-
-  sendVoiceBulk (params = {}) {
-    let config = {
-      send_json: true,
-      method: 'POST',
-      path: '/tts/3/multi',
-      route_params: null,
-      params: { messages$: Array }
-    }
-
-    if (config.route_params !== null ||
-      config.params !== null) {
-      if (_.isEmpty(params)) {
-        throw new Error('infobip api: route/input parameter(s) required')
-      }
-    }
-
-    let payload = setInputValues(config, params)
-    let pathname = setPathName(config, params)
-
-    if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
-      this.httpConfig.form = false
-    } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true
-    }
-
-    delete this.httpConfig.query
-
-    for (let type in payload) {
-      if (payload.hasOwnProperty(type)) {
-        this.httpConfig[type] = (type === 'query') ? payload[type] : JSON.parse(payload[type])
-      }
-    }
-
-    let reqVerb = config.method.toLowerCase()
-
-    return got[reqVerb](
-      `${this.baseUrl}${pathname}`,
-      this.httpConfig
-    )
-  }
-
   sendVoice (params = {}) {
     let config = {
       send_json: true,
       method: 'POST',
       path: '/tts/3/single',
       route_params: null,
-      params: { audioFileUrl: String, to$: [Array, String], text: String, from: String, language: String },
+      params: { audioFileUrl: String, to$: ['array', 'string'], voice: Object, text$: String, from$: String, language: String },
       param_defaults: { language: 'en' }
     }
 
@@ -386,11 +217,16 @@ class InfoBip {
     let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
+    if (!isTypeOf(params.voice.name, ['string']) ||
+      !isTypeOf(params.voice.gender, ['string'])) {
+      throw new TypeError('infobip api: request payload for sendVoice() not of correct type')
+    }
+
     if (config.send_json) {
       this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
       this.httpConfig.form = false
     } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       this.httpConfig.form = true
     }
 
@@ -404,19 +240,19 @@ class InfoBip {
 
     let reqVerb = config.method.toLowerCase()
 
-    return got[reqVerb](
+    return this._mock !== null ? this._mock['sendVoice'](params) : got[reqVerb](
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )
   }
 
-  sendSMSBulk (params = {}) {
+  sendSMSBinary (params = {}) {
     let config = {
       send_json: true,
       method: 'POST',
-      path: '/sms/1/text/multi',
+      path: '/sms/2/binary/advanced',
       route_params: null,
-      params: { messages$: Array }
+      params: { messages$: Array, bulkId: String }
     }
 
     if (config.route_params !== null ||
@@ -429,11 +265,40 @@ class InfoBip {
     let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
+    for (let messageIndex in params.messages) {
+      if (params.messages.hasOwnProperty(messageIndex)) {
+        let message = params.messages[messageIndex] || []
+        let destinations = message.destinations || []
+        let binary = message.binary || {}
+
+        if (!isTypeOf(message.from, ['string']) ||
+          !isTypeOf(message.text, ['string']) ||
+          !isTypeOf(message.validityPeriod, ['string'])) {
+          throw new TypeError('infobip api: request payload for [from, text, validityPeriod]; sendSMSBinary() not of correct type')
+        }
+
+        if (!isTypeOf(binary.hex, ['string']) ||
+          !isTypeOf(binary.dataCoding, ['number']) ||
+          !isTypeOf(binary.esmClass, ['number'])) {
+          throw new TypeError('infobip api: request payload for [binary]; sendSMSBinary() not of correct type')
+        }
+        for (let destinationIndex in destinations) {
+          if (destinations.hasOwnProperty(destinationIndex)) {
+            let destination = destinations[destinationIndex] || {}
+
+            if (!isTypeOf(destination.to, ['array', 'string'])) {
+              throw new TypeError('infobip api: request payload for [to]; sendSMSBinary() not of correct type')
+            }
+          }
+        }
+      }
+    }
+
     if (config.send_json) {
       this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
       this.httpConfig.form = false
     } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       this.httpConfig.form = true
     }
 
@@ -447,7 +312,7 @@ class InfoBip {
 
     let reqVerb = config.method.toLowerCase()
 
-    return got[reqVerb](
+    return this._mock !== null ? this._mock['sendSMSBinary'](params) : got[reqVerb](
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )
@@ -457,9 +322,9 @@ class InfoBip {
     let config = {
       send_json: true,
       method: 'POST',
-      path: '/sms/{:form}/text/single',
-      route_params: { form: String },
-      params: { to$: ['array', 'string'], text$: String, from: String }
+      path: '/sms/2/text/advanced',
+      route_params: null,
+      params: { messages$: Array, bulkId: String }
     }
 
     if (config.route_params !== null ||
@@ -469,16 +334,36 @@ class InfoBip {
       }
     }
 
-    params.form = (typeof params.to === 'string') ? '1' : '2'
-
     let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
+
+    for (let messageIndex in params.messages) {
+      if (params.messages.hasOwnProperty(messageIndex)) {
+        let message = params.messages[messageIndex] || []
+        let destinations = message.destinations || []
+
+        if (!isTypeOf(message.from, ['string']) ||
+          !isTypeOf(message.text, ['string'])) {
+          throw new TypeError('infobip api: request payload for [from, text]; sendSMS() not of correct type')
+        }
+
+        for (let destinationIndex in destinations) {
+          if (destinations.hasOwnProperty(destinationIndex)) {
+            let destination = destinations[destinationIndex] || {}
+
+            if (!isTypeOf(destination.to, ['array', 'string'])) {
+              throw new TypeError('infobip api: request payload for [to]; SMS not of correct type')
+            }
+          }
+        }
+      }
+    }
 
     if (config.send_json) {
       this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
       this.httpConfig.form = false
     } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
+      this.httpConfig.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       this.httpConfig.form = true
     }
 
@@ -492,44 +377,7 @@ class InfoBip {
 
     let reqVerb = config.method.toLowerCase()
 
-    return got[reqVerb](
-      `${this.baseUrl}${pathname}`,
-      this.httpConfig
-    )
-  }
-
-  getSMSDeliveryReports (params = {}) {
-    let config = {
-      send_json: false,
-      method: 'GET',
-      path: '/sms/1/reports',
-      route_params: null,
-      params: null
-    }
-
-    if (config.route_params !== null ||
-      config.params !== null) {
-      if (_.isEmpty(params)) {
-        throw new Error('infobip api: route/input parameter(s) required')
-      }
-    }
-
-    let pathname = setPathName(config, params)
-
-    if (config.send_json) {
-      this.httpConfig.headers['Content-Type'] = this.httpConfig.headers['Accept']
-      this.httpConfig.form = false
-    } else if (config.send_form) {
-      this.httpConfig.headers['Content-Type'] = 'x-www-form-urlencoded'
-      this.httpConfig.form = true
-    }
-
-    delete this.httpConfig.query
-    delete this.httpConfig.body
-
-    let reqVerb = config.method.toLowerCase()
-
-    return got[reqVerb](
+    return this._mock !== null ? this._mock['sendSMS'](params) : got[reqVerb](
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )

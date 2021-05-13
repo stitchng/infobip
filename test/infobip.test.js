@@ -16,12 +16,8 @@ describe('InfoBip Instance Test(s)', function () {
   it('should have all methods defined', function () {
     /* eslint-disable no-unused-expressions */
     expect((typeof instance.sendSMS === 'function')).to.be.true
-    expect((typeof instance.purchaseNumber === 'function')).to.be.true
-    expect((typeof instance.numbers === 'function')).to.be.true
-    expect((typeof instance.sendSMSBulk === 'function')).to.be.true
+    expect((typeof instance.sendSMSBinary === 'function')).to.be.true
     expect((typeof instance.sendVoice === 'function')).to.be.true
-    expect((typeof instance.sendVoiceBulk === 'function')).to.be.true
-    expect((typeof instance.getSMSDeliveryReports === 'function')).to.be.true
     /* eslint-enable no-unused-expressions */
   })
 
