@@ -93,10 +93,10 @@ const setPathName = (config, values) => {
     offset) {
     let _value = values[string]
     return isTypeOf(
-      _value,
-      config.route_params[string]
+      config.route_params[string],
+      _value
     )
-      ? _value
+      ? config.route_params[string]
       : null
   })
 }
@@ -313,8 +313,7 @@ class InfoBip extends Mockable {
 
     let reqVerb = config.method.toLowerCase()
 
-    return this._mock !== null ? this._mock['sendSMSBinary'].bind(this, params) : got[reqVerb].bind(
-      got,
+    return this._mock !== null ? this._mock['sendSMSBinary'].bind(this, params) : got[reqVerb](
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )
@@ -324,9 +323,9 @@ class InfoBip extends Mockable {
     let config = {
       send_json: true,
       method: 'POST',
-      path: '/sms/2/text/advanced',
-      route_params: null,
-      params: { messages$: Array, bulkId: String }
+      path: '/sms/2/text/{:type}',
+      route_params: { type: typeof params.messages === 'undefined' ? 'single' : 'advanced' },
+      params: { messages: Array, bulkId: String, from: String, to: String, text: String, type: String }
     }
 
     if (config.route_params !== null ||
@@ -339,22 +338,24 @@ class InfoBip extends Mockable {
     let payload = setInputValues(config, params)
     let pathname = setPathName(config, params)
 
-    for (let messageIndex in params.messages) {
-      if (params.messages.hasOwnProperty(messageIndex)) {
-        let message = params.messages[messageIndex] || []
-        let destinations = message.destinations || []
+    if (params.messages) {
+      for (let messageIndex in params.messages) {
+        if (params.messages.hasOwnProperty(messageIndex)) {
+          let message = params.messages[messageIndex] || []
+          let destinations = message.destinations || []
 
-        if (!isTypeOf(message.from, ['string']) ||
-          !isTypeOf(message.text, ['string'])) {
-          throw new TypeError('infobip api: request payload for [from, text]; sendSMS() not of correct type')
-        }
+          if (!isTypeOf(message.from, ['string']) ||
+            !isTypeOf(message.text, ['string'])) {
+            throw new TypeError('infobip api: request payload for [from, text]; sendSMS() not of correct type')
+          }
 
-        for (let destinationIndex in destinations) {
-          if (destinations.hasOwnProperty(destinationIndex)) {
-            let destination = destinations[destinationIndex] || {}
+          for (let destinationIndex in destinations) {
+            if (destinations.hasOwnProperty(destinationIndex)) {
+              let destination = destinations[destinationIndex] || {}
 
-            if (!isTypeOf(destination.to, ['array', 'string'])) {
-              throw new TypeError('infobip api: request payload for [to]; SMS not of correct type')
+              if (!isTypeOf(destination.to, ['array', 'string'])) {
+                throw new TypeError('infobip api: request payload for [to]; SMS not of correct type')
+              }
             }
           }
         }
@@ -379,8 +380,7 @@ class InfoBip extends Mockable {
 
     let reqVerb = config.method.toLowerCase()
 
-    return this._mock !== null ? this._mock['sendSMS'].bind(this, params) : got[reqVerb].bind(
-      got,
+    return this._mock !== null ? this._mock['sendSMS'].bind(this, params) : got[reqVerb](
       `${this.baseUrl}${pathname}`,
       this.httpConfig
     )

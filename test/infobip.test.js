@@ -23,7 +23,7 @@ describe('InfoBip Instance Test(s)', function () {
 
   it('should throw an error if [send] method is called without required arguments', function () {
     try {
-      instance.send()
+      instance.sendSMS()
     } catch (err) {
       should.exist(err)
     }
