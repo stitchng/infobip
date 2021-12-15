@@ -1,5 +1,5 @@
-<a name="0.1.0-alpha.1"></a>
-# 0.1.0- (2021-12-13)
+<a name="0.1.0"></a>
+# 0.1.0 (2021-12-15)
 
 #### Bug Fixes
 - Fixed incorrect SMS Delivery endpoint URL path
