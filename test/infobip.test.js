@@ -21,7 +21,7 @@ describe('InfoBip Instance Test(s)', function () {
     /* eslint-enable no-unused-expressions */
   })
 
-  it('should throw an error if [send] method is called without required arguments', function () {
+  it('should throw an error if [sendSMS] method is called without required arguments', function () {
     try {
       instance.sendSMS()
     } catch (err) {
