@@ -91,7 +91,7 @@ const setPathName = (config, values) => {
     match,
     string,
     offset) {
-    let _value = values[string]
+    let _value = config.params[string]
     return isTypeOf(
       config.route_params[string],
       _value
